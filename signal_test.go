@@ -1,57 +1,47 @@
 package qclient
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"testing"
-	"time"
 )
 
-const BackendURL = "http://localhost:27301/api/1.0/signals"
+func TestSignalCreate(t *testing.T) {
+	signal := NewSignalRequest("New Q app version available", "#FF0000", KeyQ).
+		WithMessage("Q App version 3 is available.").
+		WithEffect(EffectSetColor)
 
-func TestTest(t *testing.T) {
+	client, err := NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	ctx := context.Background()
 
-	client := &http.Client{
-		Timeout: time.Second * 10,
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", BackendURL, nil)
+	response, err := client.CreateSignal(ctx, signal)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	req.Header.Add("Content-Type", "application/json")
+	bytes, err := json.MarshalIndent(response, "", "  ")
 
-	signal := Signal{
-		ZoneId:     "KEY_Q",
-		Color:      "#FFFFFF",
-		Effect:     "SET_COLOR",
-		Pid:        "DK5QPID",
-		ClientName: "GoClient",
-		IsMuted:    false,
-		Message:    "Q App version 3 is available. Download it at https://www.daskeyboard.io/get-started/download/",
-		Name:       "New Q app version available",
-	}
+	fmt.Println(string(bytes))
+}
 
-	json, _ := json.MarshalIndent(signal, "", "  ")
-	req.Body = io.NopCloser(bytes.NewReader(json))
+func TestSignalDelete(t *testing.T) {
+	id := -645
 
-	fmt.Println(string(json))
-
-	res, err := client.Do(req)
+	client, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer res.Body.Close()
 
-	fmt.Println(res)
+	ctx := context.Background()
 
-	body, err := io.ReadAll(res.Body)
-	fmt.Println(string(body))
+	err = client.DeleteSignalByID(ctx, id)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
