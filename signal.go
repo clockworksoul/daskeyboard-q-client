@@ -93,7 +93,7 @@ type SignalRequest struct {
 }
 
 const (
-	DefaultProductID  = "DK5QPID"
+	DefaultProductID  = "Q_MATRIX"
 	DefaultClientName = "GoClient"
 )
 
@@ -158,4 +158,14 @@ type SignalResponse struct {
 	UserId    int    `json:"userId,omitempty"`
 	CreatedAt uint64 `json:"createdAt,omitempty"`
 	UpdatedAt uint64 `json:"updatedAt,omitempty"`
+}
+
+type SignalResponsePage struct {
+	Content       []*SignalResponse `json:"content,omitempty"`
+	Size          int               `json:"size,omitempty"`
+	Sort          string            `json:"sort,omitempty"`
+	HasNextPage   bool              `json:"hasNextPage,omitempty"`
+	Page          int               `json:"page,omitempty"`
+	TotalElements int               `json:"totalElements,omitempty"`
+	TotalPages    int               `json:"totalPages,omitempty"`
 }

@@ -26,13 +26,10 @@ func TestSignalCreate(t *testing.T) {
 	}
 
 	bytes, err := json.MarshalIndent(response, "", "  ")
-
 	fmt.Println(string(bytes))
 }
 
-func TestSignalDelete(t *testing.T) {
-	id := -645
-
+func TestGetShadows(t *testing.T) {
 	client, err := NewClient()
 	if err != nil {
 		log.Fatal(err)
@@ -40,8 +37,11 @@ func TestSignalDelete(t *testing.T) {
 
 	ctx := context.Background()
 
-	err = client.DeleteSignalByID(ctx, id)
+	response, err := client.GetShadows(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	bytes, err := json.MarshalIndent(response, "", "  ")
+	fmt.Println(string(bytes))
 }
