@@ -10,10 +10,6 @@ https://www.daskeyboard.io/get-started/
 This creates a popup message and sets the `Q` key to solid red.
 
 ```go
-signal := NewSignalRequest("New Q app version available", "#FF0000", KeyQ).
-  WithMessage("Q App version 3 is available.").
-  WithEffect(EffectSetColor)
-
 client, err := NewClient()
 if err != nil {
   log.Fatal(err)
@@ -21,13 +17,19 @@ if err != nil {
 
 ctx := context.Background()
 
+// Create the signal request. Required fields are the name, color, and zone ID.
+// To know more about zone IDs, see https://www.daskeyboard.io/q-zone-id-explanation/.
+signal := NewSignalRequest("New Q app version available", "#FF0000", KeyQ).
+  WithMessage("Q App version 3 is available.").
+  WithEffect(EffectSetColor)
+
 response, err := client.CreateSignal(ctx, signal)
 if err != nil {
   log.Fatal(err)
 }
 
 // Output the response, just for fun.
-bytes, err := json.MarshalIndent(response, "", "  ")
+bytes, _ := json.MarshalIndent(response, "", "  ")
 fmt.Println(string(bytes))
 ```
 
