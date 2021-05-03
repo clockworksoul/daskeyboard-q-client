@@ -10,30 +10,36 @@ https://www.daskeyboard.io/get-started/
 This creates a popup message and sets the `Q` key to solid red.
 
 ```go
-client, err := NewClient()
-if err != nil {
-  log.Fatal(err)
+func SetKeyToRed() (string, error) {
+  client, err := qclient.New()
+  if err != nil {
+    return "", fmt.Errorf("client error: %w", err)
+  }
+
+  // Create the signal request. Required fields are the name, color, and zone ID.
+  // To know more about zone IDs, see https://www.daskeyboard.io/q-zone-id-explanation/.
+  signal := qclient.NewSignalRequest("New Q app version available", "#FF0000", KeyQ).
+    qclient.WithMessage("Q App version 3 is available.").
+    qclient.WithEffect(EffectSetColor)
+
+  ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+  // Send the signal creation request to the API. Returns a *SignalResponse
+  // value or an error.
+  response, err := client.CreateSignal(ctx, signal)
+  if err != nil {
+    return "", fmt.Errorf("signal creation error: %w", err)
+  }
+
+  // Return the response as a string, just for fun.
+  bytes, _ := json.MarshalIndent(response, "", "  ")
+  
+  return string(bytes), nil
 }
-
-ctx := context.Background()
-
-// Create the signal request. Required fields are the name, color, and zone ID.
-// To know more about zone IDs, see https://www.daskeyboard.io/q-zone-id-explanation/.
-signal := NewSignalRequest("New Q app version available", "#FF0000", KeyQ).
-  WithMessage("Q App version 3 is available.").
-  WithEffect(EffectSetColor)
-
-response, err := client.CreateSignal(ctx, signal)
-if err != nil {
-  log.Fatal(err)
-}
-
-// Output the response, just for fun.
-bytes, _ := json.MarshalIndent(response, "", "  ")
-fmt.Println(string(bytes))
 ```
 
-The output would look something like:
+The return would look something like:
 
 ```json
 {

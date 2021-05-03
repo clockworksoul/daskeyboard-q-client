@@ -18,25 +18,25 @@ const (
 )
 
 // Client represents the client proper.
-type Client struct {
+type QClient struct {
 	apiKey  string
 	baseUrl *url.URL
 	client  *http.Client
 }
 
-type ClientConfig struct {
+type QClientConfig struct {
 	backendUrl    string
 	apiPath       string
 	apiKey        string
 	clientTimeout time.Duration
 }
 
-type ClientOption func(*ClientConfig)
+type QClientOption func(*QClientConfig)
 
-// NewClient is used to retrieve a new Q client. It accepts zero or more
-// options returned by the various With* functions.
-func NewClient(opts ...ClientOption) (*Client, error) {
-	c := &ClientConfig{
+// New is used to retrieve a new Q client. It accepts zero or more options
+// returned by the various With* functions.
+func New(opts ...QClientOption) (*QClient, error) {
+	c := &QClientConfig{
 		backendUrl:    DefaultBackendUrl,
 		apiPath:       DefaultAPIPath,
 		clientTimeout: DefaultTimeout,
@@ -52,7 +52,7 @@ func NewClient(opts ...ClientOption) (*Client, error) {
 	}
 	u = u.ResolveReference(&url.URL{Path: c.apiPath})
 
-	client := &Client{
+	client := &QClient{
 		baseUrl: u,
 		client:  &http.Client{Timeout: c.clientTimeout},
 	}
@@ -63,32 +63,32 @@ func NewClient(opts ...ClientOption) (*Client, error) {
 // WithAPIPath can be used to set the API key for interacting with Q Cloud. When set the
 // API key will be included in a X-API-KEY request header in all requests.
 // Default: None.
-func WithAPIKey(s string) ClientOption {
-	return func(c *ClientConfig) {
+func WithAPIKey(s string) QClientOption {
+	return func(c *QClientConfig) {
 		c.apiKey = s
 	}
 }
 
 // WithAPIPath can be used to set the API path. You shouldn't need to ever change this.
 // Default: /api/1.0/.
-func WithAPIPath(s string) ClientOption {
-	return func(c *ClientConfig) {
+func WithAPIPath(s string) QClientOption {
+	return func(c *QClientConfig) {
 		c.apiPath = s
 	}
 }
 
 // WithBackendURL can be used to set the base URL for the target API.
 // Default: http://localhost:27301.
-func WithBackendURL(s string) ClientOption {
-	return func(c *ClientConfig) {
+func WithBackendURL(s string) QClientOption {
+	return func(c *QClientConfig) {
 		c.backendUrl = s
 	}
 }
 
 // WithTimeout can be used to set the timeout for the underlying HTTP client.
 // Default: 1 minute.
-func WithTimeout(d time.Duration) ClientOption {
-	return func(c *ClientConfig) {
+func WithTimeout(d time.Duration) QClientOption {
+	return func(c *QClientConfig) {
 		c.clientTimeout = d
 	}
 }
@@ -99,7 +99,7 @@ func WithTimeout(d time.Duration) ClientOption {
 // to use (GET, POST, etc); "path" is the API path ("signals"); "input" is an
 // optional struct representing the request body; "output" is a struct that an
 // optional response body will be unmarshalled into.
-func (c *Client) Do(ctx context.Context, method, path string, input, output interface{}) error {
+func (c *QClient) Do(ctx context.Context, method, path string, input, output interface{}) error {
 	u := c.baseUrl.ResolveReference(&url.URL{Path: path})
 	var reqBody io.ReadCloser
 
@@ -147,7 +147,7 @@ func (c *Client) Do(ctx context.Context, method, path string, input, output inte
 // CreateSignal can be used to generate a message to a Q-enabled device. It may
 // contain lighting color and effect information as well as a message for a
 // human.
-func (c *Client) CreateSignal(ctx context.Context, s *SignalRequest) (*SignalResponse, error) {
+func (c *QClient) CreateSignal(ctx context.Context, s *SignalRequest) (*SignalResponse, error) {
 	sres := &SignalResponse{}
 	err := c.Do(ctx, "POST", "signals", s, sres)
 
@@ -155,40 +155,40 @@ func (c *Client) CreateSignal(ctx context.Context, s *SignalRequest) (*SignalRes
 }
 
 // DeleteSignalByID can be used to delete a signal using the signal id.
-func (c *Client) DeleteSignalByID(ctx context.Context, id int) error {
+func (c *QClient) DeleteSignalByID(ctx context.Context, id int) error {
 	return c.Do(ctx, "DELETE", fmt.Sprintf("signals/%d", id), nil, nil)
 }
 
 // DeleteSignalByZoneID can be used to retrieve signals by a zone ID. See
 // https://www.daskeyboard.io/q-zone-id-explanation/ for more information.
-func (c *Client) DeleteSignalByZoneID(ctx context.Context, productId string, zoneID ZoneID) error {
+func (c *QClient) DeleteSignalByZoneID(ctx context.Context, productId string, zoneID ZoneID) error {
 	return c.Do(ctx, "DELETE", fmt.Sprintf("signals/pid/%s/zoneId/%s", productId, zoneID), nil, nil)
 }
 
 // GetShadowsByProductID lists the shadows, the list of the most recent
 // signals for each zone.
-func (c *Client) GetShadowsByProductID(ctx context.Context, productId string) ([]*SignalResponse, error) {
+func (c *QClient) GetShadowsByProductID(ctx context.Context, productId string) ([]*SignalResponse, error) {
 	srs := []*SignalResponse{}
 
 	return srs, c.Do(ctx, "GET", fmt.Sprintf("signals/pid/%s/shadows", productId), nil, srs)
 }
 
 // GetShadowsByZoneID
-func (c *Client) GetShadowsByZoneID(ctx context.Context, productId string, zoneID ZoneID) ([]*SignalResponse, error) {
+func (c *QClient) GetShadowsByZoneID(ctx context.Context, productId string, zoneID ZoneID) ([]*SignalResponse, error) {
 	srs := []*SignalResponse{}
 
 	return srs, c.Do(ctx, "GET", fmt.Sprintf("signals/pid/%s/zoneId/%s", productId, zoneID), nil, srs)
 }
 
 // GetShadows gets all available shadows.
-func (c *Client) GetShadows(ctx context.Context) ([]*SignalResponse, error) {
+func (c *QClient) GetShadows(ctx context.Context) ([]*SignalResponse, error) {
 	srs := []*SignalResponse{}
 	return srs, c.Do(ctx, "GET", "signals/shadows", nil, &srs)
 }
 
 // GetSignals fetches a list of signals using pagination. It is only supported
 //in Q Cloud.
-func (c *Client) GetSignals(ctx context.Context, page, signalsPerPage int, sortBy string, ascending bool) (*SignalResponsePage, error) {
+func (c *QClient) GetSignals(ctx context.Context, page, signalsPerPage int, sortBy string, ascending bool) (*SignalResponsePage, error) {
 	var srp = &SignalResponsePage{}
 	var asc string
 

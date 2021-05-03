@@ -13,7 +13,7 @@ func TestSignalCreate(t *testing.T) {
 		WithMessage("Q App version 3 is available.").
 		WithEffect(EffectSetColor)
 
-	client, err := NewClient()
+	client, err := New()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,7 +30,7 @@ func TestSignalCreate(t *testing.T) {
 }
 
 func TestGetShadows(t *testing.T) {
-	client, err := NewClient()
+	client, err := New()
 	if err != nil {
 		log.Fatal(err)
 	}
