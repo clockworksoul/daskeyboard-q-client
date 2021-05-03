@@ -1,12 +1,14 @@
 # Go Client for Das Keyboard Q Service
 
-A primitive Go client for the Das Keyboard Q service. It supports both localhost and Q Cloud.
+A simple Go client that can be used to send messages to a Q-enabled device via a Das Keyboard Q service. It supports both a locally-running service and the official Q Cloud.
+
+Signals may contain lighting color and effect information, as well as a message for a human.
 
 https://www.daskeyboard.io/get-started/
 
 ## How to use this
 
-This creates a popup message and sets the `Q` key to solid red.
+This builds a `SignalRequest` value to trigger a popup message and set the `Q` key to solid red, which it effects by using the client's `CreateSignal` method to send a message to the Q API.
 
 ```go
 package main
