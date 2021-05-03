@@ -32,6 +32,8 @@ type ClientConfig struct {
 
 type ClientOption func(*ClientConfig)
 
+// NewClient is used to retrieve a new Q client. It accepts zero or more
+// options returned by the various With* functions.
 func NewClient(opts ...ClientOption) (*Client, error) {
 	c := &ClientConfig{
 		backendUrl:    DefaultBackendUrl,
@@ -57,30 +59,45 @@ func NewClient(opts ...ClientOption) (*Client, error) {
 	return client, nil
 }
 
+// WithAPIPath can be used to set the API key for interacting with Q Cloud. When set the
+// API key will be included in a X-API-KEY request header in all requests.
+// Default: None.
 func WithAPIKey(s string) ClientOption {
 	return func(c *ClientConfig) {
 		c.apiKey = s
 	}
 }
 
+// WithAPIPath can be used to set the API path. You shouldn't need to ever change this.
+// Default: /api/1.0/.
 func WithAPIPath(s string) ClientOption {
 	return func(c *ClientConfig) {
 		c.apiPath = s
 	}
 }
 
+// WithBackendURL can be used to set the base URL for the target API.
+// Default: http://localhost:27301.
 func WithBackendURL(s string) ClientOption {
 	return func(c *ClientConfig) {
 		c.backendUrl = s
 	}
 }
 
+// WithTimeout can be used to set the timeout for the underlying HTTP client.
+// Default: 1 minute.
 func WithTimeout(d time.Duration) ClientOption {
 	return func(c *ClientConfig) {
 		c.clientTimeout = d
 	}
 }
 
+// Do is a low-level method that can be used to execute a raw request to the
+// service API. Generally you wouldn't use this directly, instead using the
+// various Create|Delete|Get methods. The "method" parameter is the HTTP method
+// to use (GET, POST, etc); "path" is the API path ("signals"); "input" is an
+// optional struct representing the request body; "output" is a struct that an
+// optional response body will be unmarshalled into.
 func (c *Client) Do(ctx context.Context, method, path string, input, output interface{}) error {
 	u := c.baseUrl.ResolveReference(&url.URL{Path: path})
 	var reqBody io.ReadCloser
@@ -147,7 +164,8 @@ func (c *Client) DeleteSignalByZoneID(ctx context.Context, productId string, zon
 	return c.Do(ctx, "DELETE", fmt.Sprintf("signals/pid/%s/zoneId/%s", productId, zoneID), nil, nil)
 }
 
-// GetShadowsByProductID lists the shadows, the list of the most recent signals for each zone.
+// GetShadowsByProductID lists the shadows, the list of the most recent
+// signals for each zone.
 func (c *Client) GetShadowsByProductID(ctx context.Context, productId string) ([]*SignalResponse, error) {
 	srs := []*SignalResponse{}
 
@@ -167,7 +185,8 @@ func (c *Client) GetShadows(ctx context.Context) ([]*SignalResponse, error) {
 	return srs, c.Do(ctx, "GET", "signals/shadows", nil, &srs)
 }
 
-// GetSignals fetches a list of signals using pagination. It is only supported in Q Cloud.
+// GetSignals fetches a list of signals using pagination. It is only supported
+//in Q Cloud.
 func (c *Client) GetSignals(ctx context.Context, page, signalsPerPage int, sortBy string, ascending bool) (*SignalResponsePage, error) {
 	var srp = &SignalResponsePage{}
 	var asc string
