@@ -17,6 +17,7 @@ const (
 	DefaultTimeout    = time.Minute
 )
 
+// Client represents the client proper.
 type Client struct {
 	apiKey  string
 	baseUrl *url.URL
