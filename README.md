@@ -23,7 +23,7 @@ func SetKeyToRed() (string, error) {
     qclient.WithEffect(EffectSetColor)
 
   ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-	defer cancel()
+  defer cancel()
 
   // Send the signal creation request to the API. Returns a *SignalResponse
   // value or an error.
