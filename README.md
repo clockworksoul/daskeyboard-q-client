@@ -18,7 +18,7 @@ func SetKeyToRed() (string, error) {
 
   // Create the signal request. Required fields are the name, color, and zone ID.
   // To know more about zone IDs, see https://www.daskeyboard.io/q-zone-id-explanation/.
-  signal := qclient.NewSignalRequest("New Q app version available", "#FF0000", KeyQ).
+  signal := qclient.NewSignalRequest("New Q app version available", "#FF0000", qclient.KeyQ).
     qclient.WithMessage("Q App version 3 is available.").
     qclient.WithEffect(EffectSetColor)
 
