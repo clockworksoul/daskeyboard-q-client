@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.1] - 2021-05-03
+
+- Fix go.mod package path
+
 ## [0.1.0] - 2021-05-03
 
 - Rename: NewClient() -> New()
