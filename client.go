@@ -57,15 +57,27 @@ func NewClient(opts ...ClientOption) (*Client, error) {
 	return client, nil
 }
 
-func WithTimeout(d time.Duration) ClientOption {
-	return func(c *ClientConfig) {
-		c.clientTimeout = d
-	}
-}
-
 func WithAPIKey(s string) ClientOption {
 	return func(c *ClientConfig) {
 		c.apiKey = s
+	}
+}
+
+func WithAPIPath(s string) ClientOption {
+	return func(c *ClientConfig) {
+		c.apiPath = s
+	}
+}
+
+func WithBackendURL(s string) ClientOption {
+	return func(c *ClientConfig) {
+		c.backendUrl = s
+	}
+}
+
+func WithTimeout(d time.Duration) ClientOption {
+	return func(c *ClientConfig) {
+		c.clientTimeout = d
 	}
 }
 
